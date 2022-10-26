@@ -23,7 +23,9 @@
         <h2>Scroll down to see the data.</h2>
         <script src="https://d3js.org/d3.v7.min.js"></script>
         <script>
-            var diameter = 500, //max size of the bubbles
+            //https://multimedia.report/classes/coding/2018/exercises/basicbubblepackchart/
+
+            var diameter = 1000, //max size of the bubbles
                 format = d3.format(",d"),
                 color = d3.scaleOrdinal(d3.schemeCategory10);
             //more color options: https://github.com/d3/d3-scale-chromatic
@@ -70,7 +72,7 @@
                     .attr("x", function (d) { return d.x; })
                     .attr("y", function (d) { return d.y + 5; })
                     .attr("text-anchor", "middle")
-                    .text(function (d) { return d.data["Fruit"]; })
+                    .text(function (d) { return d.data["YEAR"]; })
                     .style("fill", "white")
                     .style("font-family", "Helvetica Neue, Helvetica, Arial, san-serif")
                     .style("font-size", "12px");
