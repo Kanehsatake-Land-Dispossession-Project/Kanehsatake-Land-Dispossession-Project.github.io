@@ -19,68 +19,167 @@
     </style>
 </head>
 <body>
+    <!-- Initialize a select button -->
+    <h2>Scroll down to see the data.</h2>
+    <p>YEAR<br /><select id="selectButton"></select></p>
     <div class="container">
-        <h2>Scroll down to see the data.</h2>
         <script src="https://d3js.org/d3.v7.min.js"></script>
+        <!-- Bubble Cloud Graphs -->
+        <div id='vis' class="svg-container"></div>
         <script>
-            // for local testing: cd to dir of index.html && python -m http.server
-            // https://multimedia.report/classes/coding/2018/exercises/basicbubblepackchart/
+            // bubbleChart creation function; instantiate new bubble chart given a DOM element to display it in and a dataset to visualise
+            function bubbleChart() {
+                const width = 1920;
+                const height = 1080;
 
-            var diameter = 1000, // max size of the bubbles
-                format = d3.format(",d"),
-                color = d3.scaleOrdinal(d3.schemeCategory10);
+                // location to centre the bubbles
+                const centre = { x: width / 2, y: height / 2 };
 
-            var bubble = d3.pack()
-                .size([diameter, diameter])
-                .padding(1.5);
+                // strength to apply to the position forces
+                const forceStrength = 0.03;
 
-            var svg = d3.select("body")
-                .append("svg")
-                .attr("width", diameter)
-                .attr("height", diameter)
-                .attr("class", "bubble");
+                // these will be set in createNodes and chart functions
+                let svg = null;
+                let bubbles = null;
+                let labels = null;
+                let nodes = [];
+                let years = null;
 
-            d3.csv("data/data.csv").then(function (data) {
-                // convert numerical values from strings to numbers
-                data = data.map(function (d) { d.value = +d["AREA (in SQM)"]; return d; });
+                // charge is dependent on size of the bubble, so bigger towards the middle
+                function charge(d) {
+                    return Math.pow(d.radius, 2.0) * 0.01
+                }
 
-                // sets up a hierarchy of data object
-                var root = d3.hierarchy({ children: data })
-                    .sum(function (d) { return d.value; })
-                    .sort(function (a, b) { return b.value - a.value; });
+                // create a force simulation and add forces to it
+                const simulation = d3.forceSimulation()
+                    .force('charge', d3.forceManyBody().strength(charge))
+                    // .force('center', d3.forceCenter(centre.x, centre.y))
+                    .force('x', d3.forceX().strength(forceStrength).x(centre.x))
+                    .force('y', d3.forceY().strength(forceStrength).y(centre.y))
+                    .force('collision', d3.forceCollide().radius(d => d.radius + 1));
 
-                // once we have hierarchal data, run bubble generator
-                bubble(root);
+                // force simulation starts up automatically, which we don't want as there aren't any nodes yet
+                simulation.stop();
 
-                // setup the chart
-                var bubbles = svg.selectAll(".bubble")
-                    .data(root.children)
-                    .enter();
+                // set up colour scale
+                const fillColour = d3.scaleOrdinal(d3.schemeCategory10);
 
-                // create the bubbles
-                bubbles.append("circle")
-                    .attr("class", "circle")
-                    .attr("r", function (d) { return d.r; })
-                    .attr("cx", function (d) { return d.x; })
-                    .attr("cy", function (d) { return d.y; })
-                    .style("fill", function (d) { return color(d.value); });
+                // data manipulation function takes raw data from csv and converts it into an array of node objects
+                // each node will store data and visualisation values to draw a bubble
+                // rawData is expected to be an array of data objects, read in d3.csv
+                // function returns the new node array, with a node for each element in the rawData input
+                function createNodes(rawData) {
+                    // use max size in the data as the max in the scale's domain
+                    // note we have to ensure that size is a number
+                    const maxSize = d3.max(rawData, d => +d.size);
 
-                // format the text for each bubble
-                bubbles.append("text")
-                    .attr("x", function (d) { return d.x; })
-                    .attr("y", function (d) { return d.y + 5; })
-                    .attr("text-anchor", "middle")
-                    .text(function (d) { return d.data["YEAR"]; })
-                    .style("fill", "white")
-                    .style("font-family", "Helvetica Neue, Helvetica, Arial, san-serif")
-                    .style("font-size", "12px");
+                    // size bubbles based on area
+                    const radiusScale = d3.scaleSqrt()
+                        .domain([0, maxSize])
+                        .range([0, 80])
 
-                // group by date
-                // https://observablehq.com/@d3/d3-group - Key equality
-                dataByYear = d3.group(data, d => d.YEAR); // grouping same dates into InternMap https://observablehq.com/@mbostock/internmap
-                years = dataByYear.keys(); // get a list of each year to make bubble charts per year
-                console.log(years);
-            });
+                    // use map() to convert raw data into node data
+                    const myNodes = rawData.map(d => ({
+                        ...d,
+                        radius: radiusScale(+d.size),
+                        size: +d.size,
+                        x: +d.year,
+                        y: Math.random()
+                    }))
+
+                    return myNodes;
+                }
+
+                // main entry point to bubble chart, returned by parent closure
+                // prepares rawData for visualisation and adds an svg element to the provided selector and starts the visualisation process
+                let chart = function chart(selector, rawData) {
+                    // convert raw data into nodes data
+                    nodes = createNodes(rawData);
+
+                    //=======================================================GET ONE GRAPH PER YEAR=======================================================
+                    // group by year
+                    const allGroup = d3.group(rawData, d => d.year)
+                    console.log(allGroup)
+
+                    // add the options to the button
+                    d3.select("#selectButton")
+                        .selectAll('myOptions')
+                        .data(allGroup.keys())
+                        .enter()
+                        .append('option')
+                        .text(function (d) { return d; }) // text showed in the menu
+                        .attr("value", function (d) { return d; }) // corresponding value returned by the button
+
+                    // When the button is changed, update data
+                    d3.select("#selectButton").on("change", function (event, d) {
+                        // recover the option that has been chosen
+                        const selectedOption = d3.select(this).property("value")
+                        // run an update function with this selected option
+                        console.log(allGroup.get(selectedOption))
+                    })
+                    //=======================================================GET ONE GRAPH PER YEAR=======================================================
+
+                    // create svg element inside provided selector
+                    svg = d3.select(selector)
+                        .append('svg')
+                        .attr('width', width)
+                        .attr('height', height)
+
+                    // bind nodes data to circle elements
+                    const elements = svg.selectAll('.bubble')
+                        .data(nodes, d => d.year)
+                        .enter()
+                        .append('g')
+
+                    bubbles = elements
+                        .append('circle')
+                        .classed('bubble', true)
+                        .attr('r', d => d.radius)
+                        .attr('fill', d => fillColour(d.year))
+
+                    // labels
+                    labels = elements
+                        .append('text')
+                        .attr('dy', '.3em')
+                        .style('text-anchor', 'middle')
+                        .style('font-size', 10)
+                        .text(d => d.size + ' SqM')
+
+                    // set simulation's nodes to our newly created nodes array
+                    // simulation starts running automatically once nodes are set
+                    simulation.nodes(nodes)
+                        .on('tick', ticked)
+                        .restart();
+                }
+
+                // callback function called after every tick of the force simulation
+                // here we do the actual repositioning of the circles based on current x and y value of their bound node data
+                // x and y values are modified by the force simulation
+                function ticked() {
+                    bubbles
+                        .attr('cx', d => d.x)
+                        .attr('cy', d => d.y)
+
+                    labels
+                        .attr('x', d => d.x)
+                        .attr('y', d => d.y)
+                }
+
+                // return chart function from closure
+                return chart;
+            }
+
+            // new bubble chart instance
+            let myBubbleChart = bubbleChart();
+
+            // function called once promise is resolved and data is loaded from csv
+            // calls bubble chart function to display inside #vis div
+            function display(data) {
+                myBubbleChart('#vis', data);
+            }
+
+            // load data
+            d3.csv('data/data.csv').then(display);
         </script>
     </div>
 </body>
