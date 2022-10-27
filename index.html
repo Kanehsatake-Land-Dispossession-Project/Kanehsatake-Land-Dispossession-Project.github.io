@@ -23,12 +23,12 @@
         <h2>Scroll down to see the data.</h2>
         <script src="https://d3js.org/d3.v7.min.js"></script>
         <script>
-            //https://multimedia.report/classes/coding/2018/exercises/basicbubblepackchart/
+            // for local testing: cd to dir of index.html && python -m http.server
+            // https://multimedia.report/classes/coding/2018/exercises/basicbubblepackchart/
 
-            var diameter = 1000, //max size of the bubbles
+            var diameter = 1000, // max size of the bubbles
                 format = d3.format(",d"),
                 color = d3.scaleOrdinal(d3.schemeCategory10);
-            //more color options: https://github.com/d3/d3-scale-chromatic
 
             var bubble = d3.pack()
                 .size([diameter, diameter])
@@ -41,25 +41,23 @@
                 .attr("class", "bubble");
 
             d3.csv("data/data.csv").then(function (data) {
-
-
-                //convert numerical values from strings to numbers
+                // convert numerical values from strings to numbers
                 data = data.map(function (d) { d.value = +d["AREA (in SQM)"]; return d; });
 
-                //Sets up a hierarchy of data object
+                // sets up a hierarchy of data object
                 var root = d3.hierarchy({ children: data })
                     .sum(function (d) { return d.value; })
                     .sort(function (a, b) { return b.value - a.value; });
 
-                //Once we have hierarchal data, run bubble generator
+                // once we have hierarchal data, run bubble generator
                 bubble(root);
 
-                //setup the chart
+                // setup the chart
                 var bubbles = svg.selectAll(".bubble")
                     .data(root.children)
                     .enter();
 
-                //create the bubbles
+                // create the bubbles
                 bubbles.append("circle")
                     .attr("class", "circle")
                     .attr("r", function (d) { return d.r; })
@@ -67,7 +65,7 @@
                     .attr("cy", function (d) { return d.y; })
                     .style("fill", function (d) { return color(d.value); });
 
-                //format the text for each bubble
+                // format the text for each bubble
                 bubbles.append("text")
                     .attr("x", function (d) { return d.x; })
                     .attr("y", function (d) { return d.y + 5; })
@@ -76,6 +74,12 @@
                     .style("fill", "white")
                     .style("font-family", "Helvetica Neue, Helvetica, Arial, san-serif")
                     .style("font-size", "12px");
+
+                // group by date
+                // https://observablehq.com/@d3/d3-group - Key equality
+                dataByYear = d3.group(data, d => d.YEAR); // grouping same dates into InternMap https://observablehq.com/@mbostock/internmap
+                years = dataByYear.keys(); // get a list of each year to make bubble charts per year
+                console.log(years);
             });
         </script>
     </div>
