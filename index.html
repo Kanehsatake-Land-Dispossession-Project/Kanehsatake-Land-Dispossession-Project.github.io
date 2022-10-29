@@ -27,10 +27,27 @@
         <!-- Bubble Cloud Graphs -->
         <div id='vis' class="svg-container"></div>
         <script>
+            /*
+            * Helper function to convert a number into a string
+            * and add commas to it to improve presentation.
+            */
+            function addCommas(nStr) {
+                nStr += '';
+                var x = nStr.split('.');
+                var x1 = x[0];
+                var x2 = x.length > 1 ? '.' + x[1] : '';
+                var rgx = /(\d+)(\d{3})/;
+                while (rgx.test(x1)) {
+                    x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                }
+
+                return x1 + x2;
+            }
+
             // bubbleChart creation function; instantiate new bubble chart given a DOM element to display it in and a dataset to visualise
             function bubbleChart() {
-                const width = 1920;
-                const height = 1080;
+                const width = (window.innerWidth > 0) ? window.innerWidth : screen.width;
+                const height = width;
 
                 // location to centre the bubbles
                 const centre = { x: width / 2, y: height / 2 };
@@ -44,6 +61,9 @@
                 let labels = null;
                 let nodes = [];
                 let allYears = null;
+                let totalGov = 0;
+                let totalKan = 0;
+                let total = 0;
 
                 // charge is dependent on size of the bubble, so bigger towards the middle
                 function charge(d) {
@@ -83,6 +103,7 @@
                         ...d,
                         radius: radiusScale(+d.size),
                         size: +d.size,
+                        buyer: d.buyer,
                         x: Math.random(),
                         y: Math.random()
                     }))
@@ -93,9 +114,13 @@
                 // main entry point to bubble chart, returned by parent closure
                 // prepares rawData for visualisation and adds an svg element to the provided selector and starts the visualisation process
                 let chart = function chart(selector, rawData) {
+
+                    total = d3.sum(rawData, d => +d.size);
+
                     //=======================================================GET ONE GRAPH PER YEAR=======================================================
                     // group by year
                     allYears = d3.group(rawData, d => d.year)
+                    //var options = ['Years', 'Show All']
 
                     // add the options to the button
                     d3.select("#selectButton")
@@ -123,7 +148,7 @@
                             .force('center', d3.forceCenter(centre.x, centre.y))
                             .force('x', d3.forceX().strength(forceStrength).x(centre.x))
                             .force('y', d3.forceY().strength(forceStrength).y(centre.y))
-                            .force('collision', d3.forceCollide().radius(d => d.radius + 1));
+                            .force('collision', d3.forceCollide().radius(d => d.radius + 5));
 
                         nodes = createNodes(newData);
 
@@ -132,6 +157,51 @@
                             .append('svg')
                             .attr('width', width)
                             .attr('height', height)
+
+                        // MUST CALCULATE TOTALS UNTIL NEW DATA DATE
+                        totalGov = 0;
+                        totalKan = 0;
+                        if (newData[0].buyer === 'gov')
+                        {
+                            totalKan = parseInt(total) - d3.sum(newData, d => +d.size);
+                            totalGov = d3.sum(newData, d => +d.size);
+                        }
+                        else
+                        {
+                            totalGov = parseInt(total) - d3.sum(newData, d => +d.size);
+                            totalKan = d3.sum(newData, d => +d.size);
+                        }
+                        //total = parseInt(total) - parseInt(totalGov);
+
+                        // buyer title
+                        svg.append("text")
+                            .attr("x", (width / 6))
+                            .attr("y", 40)
+                            .attr("text-anchor", "middle")
+                            .style("font-size", "25px")
+                            .style('fill', 'white')
+                            .style("text-decoration", "underline")
+                            .text("Government: " + addCommas(totalGov) + " SqM");
+
+                        // buyer title
+                        svg.append("text")
+                            .attr("x", (width / 2))
+                            .attr("y", 40)
+                            .attr("text-anchor", "middle")
+                            .style("font-size", "25px")
+                            .style('fill', 'white')
+                            .style("text-decoration", "underline")
+                            .text("Total Area: " + addCommas(total) + " SqM");
+
+                        // buyer title
+                        svg.append("text")
+                            .attr("x", (width - (width / 6)))
+                            .attr("y", 40)
+                            .attr("text-anchor", "middle")
+                            .style("font-size", "25px")
+                            .style('fill', 'white')
+                            .style("text-decoration", "underline")
+                            .text("Kanehsatake: " + addCommas(totalKan) + " SqM");
 
                         // bind nodes data to circle elements
                         elements = svg.selectAll('.bubble')
@@ -150,7 +220,9 @@
                             .append('text')
                             .attr('dy', '.3em')
                             .style('text-anchor', 'middle')
-                            .style('font-size', 10)
+                            .style('font-size', 20)
+                            .style('fill', 'white')
+                            .style('stroke', 'white')
                             .text(d => d.size + ' SqM')
 
                         // set simulation's nodes to our newly created nodes array
@@ -180,15 +252,16 @@
                         .append('circle')
                         .classed('bubble', true)
                         .attr('r', d => d.radius)
-                        .attr('fill', d => fillColour(d.year))
+                        .attr('fill', d => fillColour(d.buyer))
 
                     // labels
                     labels = elements
                         .append('text')
                         .attr('dy', '.3em')
                         .style('text-anchor', 'middle')
+                        .style('fill', 'white')
                         .style('font-size', 10)
-                        .text(d => d.size + ' SqM')
+                        .text(d => d.year)
 
                     // set simulation's nodes to our newly created nodes array
                     // simulation starts running automatically once nodes are set
@@ -224,7 +297,7 @@
             }
 
             // load data
-            d3.csv('data/takenFromKanehsatake.csv').then(display);
+            d3.csv('data/data.csv').then(display);
         </script>
     </div>
 </body>
