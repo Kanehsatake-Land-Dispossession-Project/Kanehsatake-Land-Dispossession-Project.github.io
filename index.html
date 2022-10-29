@@ -43,7 +43,7 @@
                 let bubbles = null;
                 let labels = null;
                 let nodes = [];
-                let years = null;
+                let allYears = null;
 
                 // charge is dependent on size of the bubble, so bigger towards the middle
                 function charge(d) {
@@ -51,9 +51,9 @@
                 }
 
                 // create a force simulation and add forces to it
-                const simulation = d3.forceSimulation()
+                let simulation = d3.forceSimulation()
                     .force('charge', d3.forceManyBody().strength(charge))
-                    // .force('center', d3.forceCenter(centre.x, centre.y))
+                    .force('center', d3.forceCenter(centre.x, centre.y))
                     .force('x', d3.forceX().strength(forceStrength).x(centre.x))
                     .force('y', d3.forceY().strength(forceStrength).y(centre.y))
                     .force('collision', d3.forceCollide().radius(d => d.radius + 1));
@@ -83,7 +83,7 @@
                         ...d,
                         radius: radiusScale(+d.size),
                         size: +d.size,
-                        x: +d.year,
+                        x: Math.random(),
                         y: Math.random()
                     }))
 
@@ -93,18 +93,14 @@
                 // main entry point to bubble chart, returned by parent closure
                 // prepares rawData for visualisation and adds an svg element to the provided selector and starts the visualisation process
                 let chart = function chart(selector, rawData) {
-                    // convert raw data into nodes data
-                    nodes = createNodes(rawData);
-
                     //=======================================================GET ONE GRAPH PER YEAR=======================================================
                     // group by year
-                    const allGroup = d3.group(rawData, d => d.year)
-                    console.log(allGroup)
+                    allYears = d3.group(rawData, d => d.year)
 
                     // add the options to the button
                     d3.select("#selectButton")
                         .selectAll('myOptions')
-                        .data(allGroup.keys())
+                        .data(allYears.keys())
                         .enter()
                         .append('option')
                         .text(function (d) { return d; }) // text showed in the menu
@@ -115,9 +111,58 @@
                         // recover the option that has been chosen
                         const selectedOption = d3.select(this).property("value")
                         // run an update function with this selected option
-                        console.log(allGroup.get(selectedOption))
+                        updateData(Array.from(allYears.get(selectedOption).values()))
                     })
+
+                    function updateData(newData) {
+                        d3.selectAll('svg').remove();
+
+                        // create a force simulation and add forces to it
+                        simulation = d3.forceSimulation()
+                            .force('charge', d3.forceManyBody().strength(charge))
+                            .force('center', d3.forceCenter(centre.x, centre.y))
+                            .force('x', d3.forceX().strength(forceStrength).x(centre.x))
+                            .force('y', d3.forceY().strength(forceStrength).y(centre.y))
+                            .force('collision', d3.forceCollide().radius(d => d.radius + 1));
+
+                        nodes = createNodes(newData);
+
+                        // create svg element inside provided selector
+                        svg = d3.select(selector)
+                            .append('svg')
+                            .attr('width', width)
+                            .attr('height', height)
+
+                        // bind nodes data to circle elements
+                        elements = svg.selectAll('.bubble')
+                            .data(nodes, d => d.year)
+                            .enter()
+                            .append('g')
+
+                        bubbles = elements
+                            .append('circle')
+                            .classed('bubble', true)
+                            .attr('r', d => d.radius)
+                            .attr('fill', d => fillColour(d.size))
+
+                        // labels
+                        labels = elements
+                            .append('text')
+                            .attr('dy', '.3em')
+                            .style('text-anchor', 'middle')
+                            .style('font-size', 10)
+                            .text(d => d.size + ' SqM')
+
+                        // set simulation's nodes to our newly created nodes array
+                        // simulation starts running automatically once nodes are set
+                        simulation.nodes(nodes)
+                            .on('tick', ticked)
+                            .restart();
+                    }
                     //=======================================================GET ONE GRAPH PER YEAR=======================================================
+
+                    // convert raw data into nodes data
+                    nodes = createNodes(rawData);
 
                     // create svg element inside provided selector
                     svg = d3.select(selector)
@@ -126,7 +171,7 @@
                         .attr('height', height)
 
                     // bind nodes data to circle elements
-                    const elements = svg.selectAll('.bubble')
+                    elements = svg.selectAll('.bubble')
                         .data(nodes, d => d.year)
                         .enter()
                         .append('g')
@@ -179,7 +224,7 @@
             }
 
             // load data
-            d3.csv('data/data.csv').then(display);
+            d3.csv('data/takenFromKanehsatake.csv').then(display);
         </script>
     </div>
 </body>
