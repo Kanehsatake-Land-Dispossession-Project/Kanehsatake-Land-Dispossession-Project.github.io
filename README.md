@@ -6,3 +6,6 @@ To run locally:
 3. cd to directory where local files are stored
 4. run "python -m http.server"
 5. open browser on "localhost:8000"
+
+To run online:
+Go to: https://lea-denieul.github.io/
