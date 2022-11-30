@@ -261,7 +261,7 @@
                                 .duration(5000)
                                 .ease(d3.easeLinear)
                                 .style('fill', 'purple')
-                                .text(d => (Math.round((d.totalK / d.totalS) * 100) + "%"))
+                                .text(d => (Math.round((d.totalK / d.total) * 100) + "%"))
                                 .transition()
                                 .delay(function (d, i) { return 10000 * i; })
                                 .ease(d3.easeSinInOut)
