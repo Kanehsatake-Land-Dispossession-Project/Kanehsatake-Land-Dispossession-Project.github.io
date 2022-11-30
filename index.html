@@ -19,9 +19,6 @@
     </style>
 </head>
 <body>
-    <!-- Initialize a select button -->
-    <h2>Scroll down to see the data.</h2>
-    <p>YEAR<br /><select id="selectButton"></select></p>
     <div class="container">
         <script src="https://d3js.org/d3.v7.min.js"></script>
         <!-- Bubble Cloud Graphs -->
@@ -61,9 +58,6 @@
                 let labels = null;
                 let nodes = [];
                 let allYears = null;
-                let totalGov = 0;
-                let totalKan = 0;
-                let total = 0;
 
                 // charge is dependent on size of the bubble, so bigger towards the middle
                 function charge(d) {
@@ -82,7 +76,7 @@
                 simulation.stop();
 
                 // set up colour scale
-                const fillColour = d3.scaleOrdinal(d3.schemeCategory10);
+                const fillColour = d3.scaleOrdinal(['purple']);
 
                 // data manipulation function takes raw data from csv and converts it into an array of node objects
                 // each node will store data and visualisation values to draw a bubble
@@ -114,125 +108,6 @@
                 // main entry point to bubble chart, returned by parent closure
                 // prepares rawData for visualisation and adds an svg element to the provided selector and starts the visualisation process
                 let chart = function chart(selector, rawData) {
-
-                    total = d3.sum(rawData, d => +d.size);
-
-                    //=======================================================GET ONE GRAPH PER YEAR=======================================================
-                    // group by year
-                    allYears = d3.group(rawData, d => d.year)
-                    //var options = ['Years', 'Show All']
-
-                    // add the options to the button
-                    d3.select("#selectButton")
-                        .selectAll('myOptions')
-                        .data(allYears.keys())
-                        .enter()
-                        .append('option')
-                        .text(function (d) { return d; }) // text showed in the menu
-                        .attr("value", function (d) { return d; }) // corresponding value returned by the button
-
-                    // When the button is changed, update data
-                    d3.select("#selectButton").on("change", function (event, d) {
-                        // recover the option that has been chosen
-                        const selectedOption = d3.select(this).property("value")
-                        // run an update function with this selected option
-                        updateData(Array.from(allYears.get(selectedOption).values()))
-                    })
-
-                    function updateData(newData) {
-                        d3.selectAll('svg').remove();
-
-                        // create a force simulation and add forces to it
-                        simulation = d3.forceSimulation()
-                            .force('charge', d3.forceManyBody().strength(charge))
-                            .force('center', d3.forceCenter(centre.x, centre.y))
-                            .force('x', d3.forceX().strength(forceStrength).x(centre.x))
-                            .force('y', d3.forceY().strength(forceStrength).y(centre.y))
-                            .force('collision', d3.forceCollide().radius(d => d.radius + 5));
-
-                        nodes = createNodes(newData);
-
-                        // create svg element inside provided selector
-                        svg = d3.select(selector)
-                            .append('svg')
-                            .attr('width', width)
-                            .attr('height', height)
-
-                        // MUST CALCULATE TOTALS UNTIL NEW DATA DATE
-                        totalGov = 0;
-                        totalKan = 0;
-                        if (newData[0].buyer === 'gov')
-                        {
-                            totalKan = parseInt(total) - d3.sum(newData, d => +d.size);
-                            totalGov = d3.sum(newData, d => +d.size);
-                        }
-                        else
-                        {
-                            totalGov = parseInt(total) - d3.sum(newData, d => +d.size);
-                            totalKan = d3.sum(newData, d => +d.size);
-                        }
-                        //total = parseInt(total) - parseInt(totalGov);
-
-                        // buyer title
-                        svg.append("text")
-                            .attr("x", (width / 6))
-                            .attr("y", 40)
-                            .attr("text-anchor", "middle")
-                            .style("font-size", "25px")
-                            .style('fill', 'white')
-                            .style("text-decoration", "underline")
-                            .text("Government: " + addCommas(totalGov) + " SqM");
-
-                        // buyer title
-                        svg.append("text")
-                            .attr("x", (width / 2))
-                            .attr("y", 40)
-                            .attr("text-anchor", "middle")
-                            .style("font-size", "25px")
-                            .style('fill', 'white')
-                            .style("text-decoration", "underline")
-                            .text("Total Area: " + addCommas(total) + " SqM");
-
-                        // buyer title
-                        svg.append("text")
-                            .attr("x", (width - (width / 6)))
-                            .attr("y", 40)
-                            .attr("text-anchor", "middle")
-                            .style("font-size", "25px")
-                            .style('fill', 'white')
-                            .style("text-decoration", "underline")
-                            .text("Kanehsatake: " + addCommas(totalKan) + " SqM");
-
-                        // bind nodes data to circle elements
-                        elements = svg.selectAll('.bubble')
-                            .data(nodes, d => d.year)
-                            .enter()
-                            .append('g')
-
-                        bubbles = elements
-                            .append('circle')
-                            .classed('bubble', true)
-                            .attr('r', d => d.radius)
-                            .attr('fill', d => fillColour(d.size))
-
-                        // labels
-                        labels = elements
-                            .append('text')
-                            .attr('dy', '.3em')
-                            .style('text-anchor', 'middle')
-                            .style('font-size', 20)
-                            .style('fill', 'white')
-                            .style('stroke', 'white')
-                            .text(d => d.size + ' SqM')
-
-                        // set simulation's nodes to our newly created nodes array
-                        // simulation starts running automatically once nodes are set
-                        simulation.nodes(nodes)
-                            .on('tick', ticked)
-                            .restart();
-                    }
-                    //=======================================================GET ONE GRAPH PER YEAR=======================================================
-
                     // convert raw data into nodes data
                     nodes = createNodes(rawData);
 
@@ -267,7 +142,195 @@
                     // simulation starts running automatically once nodes are set
                     simulation.nodes(nodes)
                         .on('tick', ticked)
+                        .on('end', updateData)
                         .restart();
+
+                    function showMore() {
+                        svg.append('image')
+                            .attr('xlink:href', 'data/Map of Disspossession by YEAR - DRAFT.jpg')
+                            .attr("x", width * 0.1)
+                            .attr("y", width * 0.25)
+                            .attr('width', "75%")
+                            .attr('height', "75%")
+                            .style("opacity", "0")
+                            .transition()
+                            .delay(function (d, i) { return 10000 * i; })
+                            .ease(d3.easeSinInOut)
+                            .duration(10000)
+                            .style("opacity", "0")
+                            .transition()
+                            .delay(function (d, i) { return 10000 * i; })
+                            .ease(d3.easeSinInOut)
+                            .duration(10000)
+                            .style("opacity", "0")
+                            .transition()
+                            .delay(function (d, i) { return 10000 * i; })
+                            .ease(d3.easeSinInOut)
+                            .duration(10000)
+                            .style("opacity", "0.5")
+                            .transition()
+                            .delay(function (d, i) { return 10000 * i; })
+                            .ease(d3.easeSinInOut)
+                            .duration(10000)
+                            .style("opacity", "1");
+                    }
+
+                    total = d3.sum(rawData, d => +d.size);
+                    allYears = d3.group(rawData, d => d.year)
+                    years = allYears.keys()
+
+                    function updateData() {
+                        for (const item of years) {
+                            svg.selectAll('.bubble')
+                                .data(nodes)
+                                .filter(function (d) { return d.year === item && d.buyer === 'Settlers (Sold by Sulpicians)' })
+                                .transition()
+                                .delay(function (d, i) { return 100 * i; })
+                                .duration(2000)
+                                .style("fill", "grey")
+                                .transition()
+                                .delay(function (d, i) { return 100 * i; })
+                                .duration(2000)
+                                .attr("cy", function (d) { return height / 2; })
+                                .attr("r", function (d) { return 0; })
+                                .transition()
+                                .delay(function (d, i) { return 100 * i; })
+                                .duration(2000)
+                                .remove();
+
+                            svg.selectAll('.bubble')
+                                .data(nodes)
+                                .filter(function (d) { return d.year === item && d.buyer === "Kanehsata'kerón (Kanehsatake)" })
+                                .transition()
+                                .delay(function (d, i) { return 100 * i; })
+                                .duration(2000)
+                                .style("stroke", "white")
+                                .transition()
+                                .delay(function (d, i) { return 100 * i; })
+                                .duration(2000)
+                                .style("opacity", "0.5")
+                                .transition()
+                                .delay(function (d, i) { return 100 * i; })
+                                .duration(2000)
+                                .attr("cx", function (d) { return (d.radius % width) + width / 2; })
+                                .attr("cy", function (d) { return height / 6; });
+
+                            d3.selectAll('text').remove();
+
+                            //var yearArr = Array.from(allYears.get(item).values());
+
+                            //https://observablehq.com/@d3/transition-texttween
+                            //text transitions delay d3
+
+                            //text updating https://bl.ocks.org/bricedev/a0c5ef180272fac3aea6
+
+                            svg.append("text")
+                                .data(nodes.filter(d => d.year == item))
+                                .attr("x", width / 2)
+                                .attr("y", width / 6 - 80)
+                                .attr("text-anchor", "middle")
+                                .style("font-size", "0px")
+                                .transition()
+                                .delay(function (d, i) { return 100 * i; })
+                                .duration(2000)
+                                .ease(d3.easeLinear)
+                                .style('fill', 'purple')
+                                .text("What remainds for the Kanehsata'kerón people:")
+                                .transition()
+                                .delay(function (d, i) { return 10000 * i; })
+                                .ease(d3.easeSinInOut)
+                                .duration(10000)
+                                .style("font-size", "35px")
+                                .style('stroke', 'purple');
+
+                            svg.append("text")
+                                .data(nodes.filter(d => d.year == item))
+                                .attr("x", (width / 2) - 50)
+                                .attr("y", width / 6)
+                                .attr("text-anchor", "middle")
+                                .style("font-size", "0px")
+                                .transition()
+                                .delay(function (d, i) { return 100 * i; })
+                                .duration(5000)
+                                .ease(d3.easeLinear)
+                                .style('fill', 'purple')
+                                .text(d => (Math.round((d.totalK / d.totalS) * 100) + "%"))
+                                .transition()
+                                .delay(function (d, i) { return 10000 * i; })
+                                .ease(d3.easeSinInOut)
+                                .duration(10000)
+                                .style("font-size", "50px")
+                                .transition()
+                                .delay(function (d, i) { return 10000 * i; })
+                                .ease(d3.easeSinInOut)
+                                .duration(10000)
+                                .style('fill', 'red');
+
+                            // year
+                            svg.append("text")
+                                .data(nodes.filter(d => d.year == item))
+                                .attr("x", (width / 2))
+                                .attr("y", 40)
+                                .attr("text-anchor", "middle")
+                                .style("font-size", "50px")
+                                .transition()
+                                .delay(function (d, i) { return 100 * i; })
+                                .duration(2000)
+                                .ease(d3.easeLinear)
+                                .style('fill', 'red')
+                                .style("text-decoration", "underline")
+                                .text(d => ('Year: ' + d.year));
+
+                            // buyer title
+                            svg.append("text")
+                                .data(nodes.filter(d => d.year == item))
+                                .attr("x", (width / 6))
+                                .attr("y", 80)
+                                .attr("text-anchor", "middle")
+                                .style("font-size", "25px")
+                                .transition()
+                                .delay(function (d, i) { return 100 * i; })
+                                .duration(2000)
+                                .ease(d3.easeLinear)
+                                .style('fill', 'white')
+                                .text(d => ("Settlers (Sold by Sulpicians): " + addCommas(d.totalS) + "m²"));
+
+                            // title
+                            svg.append("text")
+                                .data(nodes.filter(d => d.year == item))
+                                .attr("x", (width / 2))
+                                .attr("y", 80)
+                                .attr("text-anchor", "middle")
+                                .style("font-size", "25px")
+                                .transition()
+                                .delay(function (d, i) { return 100 * i; })
+                                .duration(2000)
+                                .ease(d3.easeLinear)
+                                .style('fill', 'white')
+                                .text(d => ("Total Area: " + addCommas(d.total) + "m²"));
+
+                            // buyer title
+                            svg.append("text")
+                                .data(nodes.filter(d => d.year == item))
+                                .attr("x", (width - (width / 6)))
+                                .attr("y", 80)
+                                .attr("text-anchor", "middle")
+                                .style("font-size", "25px")
+                                .transition()
+                                .delay(function (d, i) { return 100 * i; })
+                                .duration(2000)
+                                .ease(d3.easeLinear)
+                                .style('fill', 'white')
+                                .text(d => ("Kanehsata'kerón (Kanehsatake): " + addCommas(d.totalK) + "m²"));
+                        }
+
+                        // set simulation's nodes to our newly created nodes array
+                        // simulation starts running automatically once nodes are set
+                        simulation.nodes(nodes)
+                            .on('tick', ticked)
+                            .restart()
+                            .on('end', showMore);
+                    }
                 }
 
                 // callback function called after every tick of the force simulation
