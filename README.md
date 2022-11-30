@@ -7,5 +7,4 @@ To run locally:
 4. run "python -m http.server"
 5. open browser on "localhost:8000"
 
-To run online:
-Go to: https://lea-denieul.github.io/
+To run online: https://lea-denieul.github.io/
