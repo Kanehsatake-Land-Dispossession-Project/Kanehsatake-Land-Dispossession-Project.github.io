@@ -149,19 +149,19 @@
                         svg.append('image')
                             .attr('xlink:href', 'data/Map of Disspossession by YEAR - DRAFT.jpg')
                             .attr("x", width * 0.1)
-                            .attr("y", width * 0.25)
+                            .attr("y", width * 0.2)
                             .attr('width', "75%")
                             .attr('height', "75%")
                             .style("opacity", "0")
                             .transition()
                             .delay(function (d, i) { return 10000 * i; })
                             .ease(d3.easeSinInOut)
-                            .duration(10000)
+                            .duration(20000)
                             .style("opacity", "0")
                             .transition()
                             .delay(function (d, i) { return 10000 * i; })
                             .ease(d3.easeSinInOut)
-                            .duration(10000)
+                            .duration(20000)
                             .style("opacity", "0")
                             .transition()
                             .delay(function (d, i) { return 10000 * i; })
@@ -186,16 +186,20 @@
                                 .filter(function (d) { return d.year === item && d.buyer === 'Settlers (Sold by Sulpicians)' })
                                 .transition()
                                 .delay(function (d, i) { return 100 * i; })
-                                .duration(2000)
+                                .duration(1000)
+                                .style("opacity", "0.5")
+                                .transition()
+                                .delay(function (d, i) { return 100 * i; })
+                                .duration(1000)
                                 .style("fill", "grey")
                                 .transition()
                                 .delay(function (d, i) { return 100 * i; })
-                                .duration(2000)
+                                .duration(1000)
                                 .attr("cy", function (d) { return height / 2; })
                                 .attr("r", function (d) { return 0; })
                                 .transition()
                                 .delay(function (d, i) { return 100 * i; })
-                                .duration(2000)
+                                .duration(1000)
                                 .remove();
 
                             svg.selectAll('.bubble')
@@ -212,8 +216,11 @@
                                 .transition()
                                 .delay(function (d, i) { return 100 * i; })
                                 .duration(2000)
-                                .attr("cx", function (d) { return (d.radius % width) + width / 2; })
-                                .attr("cy", function (d) { return height / 6; });
+                                .attr("cy", function (d) { return height / 6; })
+                                .transition()
+                                .delay(function (d, i) { return 100 * i; })
+                                .duration(2000)
+                                .attr("cx", function (d) { return (d.radius % width) + width / 2; });
 
                             d3.selectAll('text').remove();
 
@@ -273,13 +280,12 @@
                                 .attr("y", 40)
                                 .attr("text-anchor", "middle")
                                 .style("font-size", "50px")
-                                .transition()
-                                .delay(function (d, i) { return 100 * i; })
-                                .duration(2000)
-                                .ease(d3.easeLinear)
                                 .style('fill', 'red')
                                 .style("text-decoration", "underline")
-                                .text(d => ('Year: ' + d.year));
+                                .transition()
+                                .duration(10000)
+                                .textTween((d) => t => `Year: ${1780 + Math.round(t.toFixed(6) * (d.year - 1780))}`)
+                                .end();
 
                             // buyer title
                             svg.append("text")
@@ -288,12 +294,11 @@
                                 .attr("y", 80)
                                 .attr("text-anchor", "middle")
                                 .style("font-size", "25px")
-                                .transition()
-                                .delay(function (d, i) { return 100 * i; })
-                                .duration(2000)
-                                .ease(d3.easeLinear)
                                 .style('fill', 'white')
-                                .text(d => ("Settlers (Sold by Sulpicians): " + addCommas(d.totalS) + "m²"));
+                                .transition()
+                                .duration(10000)
+                                .textTween((d) => t => `Settlers (Sold by Sulpicians): ${addCommas(Math.round(t.toFixed(6) * d.totalS))}m²`)
+                                .end();
 
                             // title
                             svg.append("text")
@@ -302,10 +307,6 @@
                                 .attr("y", 80)
                                 .attr("text-anchor", "middle")
                                 .style("font-size", "25px")
-                                .transition()
-                                .delay(function (d, i) { return 100 * i; })
-                                .duration(2000)
-                                .ease(d3.easeLinear)
                                 .style('fill', 'white')
                                 .text(d => ("Total Area: " + addCommas(d.total) + "m²"));
 
@@ -316,12 +317,10 @@
                                 .attr("y", 80)
                                 .attr("text-anchor", "middle")
                                 .style("font-size", "25px")
-                                .transition()
-                                .delay(function (d, i) { return 100 * i; })
-                                .duration(2000)
-                                .ease(d3.easeLinear)
                                 .style('fill', 'white')
-                                .text(d => ("Kanehsata'kerón (Kanehsatake): " + addCommas(d.totalK) + "m²"));
+                                .transition()
+                                .duration(10000)
+                                .textTween((d) => t => `Kanehsata'kerón (Kanehsatake): ${addCommas(d.total - Math.round(t.toFixed(6) * d.totalS))}m²`) //23,760,121
                         }
 
                         // set simulation's nodes to our newly created nodes array
