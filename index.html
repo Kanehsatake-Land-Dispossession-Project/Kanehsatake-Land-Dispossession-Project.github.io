@@ -50,7 +50,7 @@
                 const centre = { x: width / 2, y: height / 2 };
 
                 // strength to apply to the position forces
-                const forceStrength = 0.03;
+                const forceStrength = 0.1; //0.03;
 
                 // these will be set in createNodes and chart functions
                 let svg = null;
@@ -59,9 +59,9 @@
                 let nodes = [];
                 let allYears = null;
 
-                // charge is dependent on size of the bubble, so bigger towards the middle
+                // charge is dependent on size of the bubble
                 function charge(d) {
-                    return Math.pow(d.radius, 2.0) * 0.01
+                    return Math.pow(d.radius, 1.0) * 0.01 //return Math.pow(d.radius, 2.0) * 0.01
                 }
 
                 // create a force simulation and add forces to it
@@ -136,7 +136,7 @@
                         .style('text-anchor', 'middle')
                         .style('fill', 'white')
                         .style('font-size', 10)
-                        .text(d => d.year)
+                        .text(' ')//.text(d => d.year)
 
                     // set simulation's nodes to our newly created nodes array
                     // simulation starts running automatically once nodes are set
@@ -146,33 +146,33 @@
                         .restart();
 
                     function showMore() {
-                        svg.append('image')
-                            .attr('xlink:href', 'data/Map of Disspossession by YEAR - DRAFT.jpg')
-                            .attr("x", width * 0.1)
-                            .attr("y", width * 0.2)
-                            .attr('width', "75%")
-                            .attr('height', "75%")
-                            .style("opacity", "0")
-                            .transition()
-                            .delay(function (d, i) { return 10000 * i; })
-                            .ease(d3.easeSinInOut)
-                            .duration(20000)
-                            .style("opacity", "0")
-                            .transition()
-                            .delay(function (d, i) { return 10000 * i; })
-                            .ease(d3.easeSinInOut)
-                            .duration(20000)
-                            .style("opacity", "0")
-                            .transition()
-                            .delay(function (d, i) { return 10000 * i; })
-                            .ease(d3.easeSinInOut)
-                            .duration(10000)
-                            .style("opacity", "0.5")
-                            .transition()
-                            .delay(function (d, i) { return 10000 * i; })
-                            .ease(d3.easeSinInOut)
-                            .duration(10000)
-                            .style("opacity", "1");
+                        //svg.append('image')
+                        //    .attr('xlink:href', 'data/*MAP FILE NAME*')
+                        //    .attr("x", width * 0.1)
+                        //    .attr("y", width * 0.2)
+                        //    .attr('width', "75%")
+                        //    .attr('height', "75%")
+                        //    .style("opacity", "0")
+                        //    .transition()
+                        //    .delay(function (d, i) { return 10000 * i; })
+                        //    .ease(d3.easeSinInOut)
+                        //    .duration(20000)
+                        //    .style("opacity", "0")
+                        //    .transition()
+                        //    .delay(function (d, i) { return 10000 * i; })
+                        //    .ease(d3.easeSinInOut)
+                        //    .duration(20000)
+                        //    .style("opacity", "0")
+                        //    .transition()
+                        //    .delay(function (d, i) { return 10000 * i; })
+                        //    .ease(d3.easeSinInOut)
+                        //    .duration(10000)
+                        //    .style("opacity", "0.5")
+                        //    .transition()
+                        //    .delay(function (d, i) { return 10000 * i; })
+                        //    .ease(d3.easeSinInOut)
+                        //    .duration(10000)
+                        //    .style("opacity", "1");
                     }
 
                     total = d3.sum(rawData, d => +d.size);
@@ -187,24 +187,23 @@
                                 .transition()
                                 .delay(function (d, i) { return 100 * i; })
                                 .duration(1000)
-                                .style("opacity", "0.5")
-                                .transition()
-                                .delay(function (d, i) { return 100 * i; })
-                                .duration(1000)
                                 .style("fill", "grey")
                                 .transition()
-                                .delay(function (d, i) { return 100 * i; })
+                                .delay(function (d, i) { return 10 * i; })
                                 .duration(1000)
                                 .attr("cy", function (d) { return height / 2; })
                                 .attr("r", function (d) { return 0; })
-                                .transition()
-                                .delay(function (d, i) { return 100 * i; })
-                                .duration(1000)
                                 .remove();
 
                             svg.selectAll('.bubble')
                                 .data(nodes)
                                 .filter(function (d) { return d.year === item && d.buyer === "Kanehsata'kerón (Kanehsatake)" })
+                                .transition()
+                                .style("opacity", "0")
+                                .transition()
+                                .delay(function (d, i) { return 1000 * i; })
+                                .duration(2000)
+                                .attr("cy", function (d) { return height / 2; })
                                 .transition()
                                 .delay(function (d, i) { return 100 * i; })
                                 .duration(2000)
@@ -238,13 +237,13 @@
                                 .attr("text-anchor", "middle")
                                 .style("font-size", "0px")
                                 .transition()
-                                .delay(function (d, i) { return 100 * i; })
-                                .duration(2000)
+                                .delay(function (d, i) { return 10000000 * i; })
+                                .duration(10000)
                                 .ease(d3.easeLinear)
                                 .style('fill', 'purple')
-                                .text("What remainds for the Kanehsata'kerón people:")
+                                .text("What remainds for the Kanehsata'kerón:")
                                 .transition()
-                                .delay(function (d, i) { return 10000 * i; })
+                                .delay(function (d, i) { return 1000000 * i; })
                                 .ease(d3.easeSinInOut)
                                 .duration(10000)
                                 .style("font-size", "35px")
@@ -257,8 +256,8 @@
                                 .attr("text-anchor", "middle")
                                 .style("font-size", "0px")
                                 .transition()
-                                .delay(function (d, i) { return 100 * i; })
-                                .duration(5000)
+                                .delay(function (d, i) { return 10000000 * i; })
+                                .duration(10000)
                                 .ease(d3.easeLinear)
                                 .style('fill', 'purple')
                                 .text(d => (Math.round((d.totalK / d.total) * 100) + "%"))
@@ -320,7 +319,7 @@
                                 .style('fill', 'white')
                                 .transition()
                                 .duration(10000)
-                                .textTween((d) => t => `Kanehsata'kerón (Kanehsatake): ${addCommas(d.total - Math.round(t.toFixed(6) * d.totalS))}m²`) //23,760,121
+                                .textTween((d) => t => `Kanehsata'kerón (Kanehsatake): ${addCommas(d.total - Math.round(t.toFixed(6) * d.totalS))}m²`);
                         }
 
                         // set simulation's nodes to our newly created nodes array
