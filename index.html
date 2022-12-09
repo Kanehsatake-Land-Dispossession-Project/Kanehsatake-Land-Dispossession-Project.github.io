@@ -5,21 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.9/d3.js"></script>
-    <title>Map Data</title>
-    <style>
-        body {
-            background-color: black;
-            color: white;
-            cursor: crosshair;
-            text-align: center;
-            font-size: 50px;
-            margin: 0;
-            /* overflow: hidden; /* Hide scrollbars */
-        }
-    </style>
+    <title>Kanehsatake Dispossession</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
+    <!--Navbar Links-->
+    <input type="checkbox" id="active">
+    <label for="active" class="menu-btn">☰</label>
+    <div class="wrapper">
+        <ul>
+            <li><a href="index">Home</a></li>
+            <li><a href="research">About the Research</a></li>
+            <li><a href="gallery">Map Gallery</a></li>
+            <li><a href="team">Team</a></li>
+            <li><a href="comments">Comments and Question</a></li>
+            <li><a href="contribute">Contribute to this Effort</a></li>
+        </ul>
+    </div>
+
+    <div class="container" style="margin-top: 10px;">
         <script src="https://d3js.org/d3.v7.min.js"></script>
         <!-- Bubble Cloud Graphs -->
         <div id='vis' class="svg-container"></div>
@@ -45,6 +49,10 @@
             function bubbleChart() {
                 const width = 1920; //(window.innerWidth > 0) ? window.innerWidth : screen.width;
                 const height = width;
+
+                setTimeout(function () {
+                    window.scrollTo(0, height / 4);
+                }, 100);
 
                 // location to centre the bubbles
                 const centre = { x: width / 2, y: height / 2 };
@@ -76,7 +84,7 @@
                 simulation.stop();
 
                 // set up colour scale
-                const fillColour = d3.scaleOrdinal(['purple']);
+                const fillColour = d3.scaleOrdinal(['#78259f']);
 
                 // data manipulation function takes raw data from csv and converts it into an array of node objects
                 // each node will store data and visualisation values to draw a bubble
@@ -147,7 +155,7 @@
 
                     function showMore() {
                         //svg.append('image')
-                        //    .attr('xlink:href', 'data/*MAP FILE NAME*')
+                        //    .attr('xlink:href', 'resources/Artboard 1.png')
                         //    .attr("x", width * 0.1)
                         //    .attr("y", width * 0.2)
                         //    .attr('width', "75%")
@@ -173,6 +181,39 @@
                         //    .ease(d3.easeSinInOut)
                         //    .duration(10000)
                         //    .style("opacity", "1");
+
+                        //svg.append("text")
+                        //    .attr("x", (width / 2))
+                        //    .attr("y", height / 2)
+                        //    .attr("text-anchor", "middle")
+                        //    .style("font-size", "40px")
+                        //    .style("font-weight", "bold")
+                        //    .style('fill', 'white')
+                        //    .text("About the Map");
+
+                        //svg.append("text")
+                        //    .attr("x", (width / 2))
+                        //    .attr("y", 30 + height / 2)
+                        //    .attr("text-anchor", "middle")
+                        //    .style("font-size", "25px")
+                        //    .style('fill', 'white')
+                        //    .text("This map shows all the transactions involving sales or concessions of land made to European settlers and their descendants");
+
+                        //svg.append("text")
+                        //    .attr("x", (width / 2))
+                        //    .attr("y", 55 + height / 2)
+                        //    .attr("text-anchor", "middle")
+                        //    .style("font-size", "25px")
+                        //    .style('fill', 'white')
+                        //    .text("from 1780 to 1960 by a Catholic seminary run by the Society of the Priests of Saint Sulpice, later known as “Les Sulpiciens de Montréal”.");
+
+                        //svg.append("text")
+                        //    .attr("x", (width / 2))
+                        //    .attr("y", 75 + height / 2)
+                        //    .attr("text-anchor", "middle")
+                        //    .style("font-size", "25px")
+                        //    .style('fill', 'white')
+                        //    .text("The map also shows the lots which were purchased back by the government of Canada to form the interim land base known as Kanehsatà: ke today.");
                     }
 
                     total = d3.sum(rawData, d => +d.size);
@@ -180,12 +221,20 @@
                     years = allYears.keys()
 
                     function updateData() {
+                        setTimeout(function () {
+                            window.scrollTo(0, 0);
+                        }, 100);
+
                         for (const item of years) {
                             svg.selectAll('.bubble')
                                 .data(nodes)
                                 .filter(function (d) { return d.year === item && d.buyer === 'Settlers (Sold by Sulpicians)' })
                                 .transition()
-                                .delay(function (d, i) { return 100 * i; })
+                                .delay(function (d, i) { return 20 * i; })
+                                .duration(1000)
+                                .style("stroke", "white")
+                                .transition()
+                                .delay(function (d, i) { return 20 * i; })
                                 .duration(1000)
                                 .style("fill", "grey")
                                 .transition()
@@ -199,6 +248,8 @@
                                 .data(nodes)
                                 .filter(function (d) { return d.year === item && d.buyer === "Kanehsata'kerón (Kanehsatake)" })
                                 .transition()
+                                .delay(function (d, i) { return 1000 * i; })
+                                .duration(2000)
                                 .style("opacity", "0")
                                 .transition()
                                 .delay(function (d, i) { return 1000 * i; })
@@ -225,11 +276,6 @@
 
                             //var yearArr = Array.from(allYears.get(item).values());
 
-                            //https://observablehq.com/@d3/transition-texttween
-                            //text transitions delay d3
-
-                            //text updating https://bl.ocks.org/bricedev/a0c5ef180272fac3aea6
-
                             svg.append("text")
                                 .data(nodes.filter(d => d.year == item))
                                 .attr("x", width / 2)
@@ -240,14 +286,14 @@
                                 .delay(function (d, i) { return 10000000 * i; })
                                 .duration(10000)
                                 .ease(d3.easeLinear)
-                                .style('fill', 'purple')
-                                .text("What remainds for the Kanehsata'kerón:")
+                                .style('fill', '#78259f')
+                                .text("What remains for the Kanehsata'kerón:")
                                 .transition()
                                 .delay(function (d, i) { return 1000000 * i; })
                                 .ease(d3.easeSinInOut)
                                 .duration(10000)
                                 .style("font-size", "35px")
-                                .style('stroke', 'purple');
+                                .style('stroke', '#78259f');
 
                             svg.append("text")
                                 .data(nodes.filter(d => d.year == item))
@@ -259,7 +305,7 @@
                                 .delay(function (d, i) { return 10000000 * i; })
                                 .duration(10000)
                                 .ease(d3.easeLinear)
-                                .style('fill', 'purple')
+                                .style('fill', '#78259f')
                                 .text(d => (Math.round((d.totalK / d.total) * 100) + "%"))
                                 .transition()
                                 .delay(function (d, i) { return 10000 * i; })
