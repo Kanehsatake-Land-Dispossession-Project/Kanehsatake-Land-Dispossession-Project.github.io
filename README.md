@@ -1,4 +1,4 @@
-# Lea-Denieul.github.io
+# Kanehsatake-Land-Dispossession-Project.github.io
 
 To run locally:
 1. download files
@@ -7,4 +7,4 @@ To run locally:
 4. run "python -m http.server"
 5. open browser on "localhost:8000"
 
-To run online: https://lea-denieul.github.io/
+To run online: https://Kanehsatake-Land-Dispossession-Project.github.io
