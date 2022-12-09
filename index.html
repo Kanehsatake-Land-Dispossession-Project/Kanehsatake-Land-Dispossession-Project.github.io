@@ -6,10 +6,34 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.9/d3.js"></script>
     <title>Kanehsatake Dispossession</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,700;1,300;1,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            font-family: 'Cormorant Garamond', serif;
+            text-align: center;
+            font-size: 50px;
+            margin: 0;
+        }
+    </style>
 </head>
 <body>
     <!--Navbar Links-->
+    <nav class="page__menu page__custom-settings menu">
+        <ul class="menu__list r-list">
+            <li class="menu__group"><a href="index" class="menu__link r-link text-underlined">Home</a></li>
+            <li class="menu__group"><a href="research" class="menu__link r-link text-underlined">About the Research</a></li>
+            <li class="menu__group"><a href="gallery" class="menu__link r-link text-underlined">Map Gallery</a></li>
+            <li class="menu__group"><a href="team" class="menu__link r-link text-underlined">Team</a></li>
+            <li class="menu__group"><a href="comments" class="menu__link r-link text-underlined">Comments and Question</a></li>
+            <li class="menu__group"><a href="contribute" class="menu__link r-link text-underlined">Contribute to this Effort</a></li>
+        </ul>
+    </nav>
+
     <input type="checkbox" id="active">
     <label for="active" class="menu-btn">☰</label>
     <div class="wrapper">
@@ -125,6 +149,14 @@
                         .attr('width', width)
                         .attr('height', height)
 
+                    svg.append('image')
+                        .attr('xlink:href', 'resources/graph.png')
+                        .attr("x", (width / 2) - ((892 * 1.2) / 2))
+                        .attr("y", (height / 2) - (457 * 1.2))
+                        .attr('width', 892 * 1.2)
+                        .attr('height', 704 * 1.2)
+                        .style("opacity", "0");
+
                     // bind nodes data to circle elements
                     elements = svg.selectAll('.bubble')
                         .data(nodes, d => d.year)
@@ -154,33 +186,12 @@
                         .restart();
 
                     function showMore() {
-                        //svg.append('image')
-                        //    .attr('xlink:href', 'resources/Artboard 1.png')
-                        //    .attr("x", width * 0.1)
-                        //    .attr("y", width * 0.2)
-                        //    .attr('width', "75%")
-                        //    .attr('height', "75%")
-                        //    .style("opacity", "0")
-                        //    .transition()
-                        //    .delay(function (d, i) { return 10000 * i; })
-                        //    .ease(d3.easeSinInOut)
-                        //    .duration(20000)
-                        //    .style("opacity", "0")
-                        //    .transition()
-                        //    .delay(function (d, i) { return 10000 * i; })
-                        //    .ease(d3.easeSinInOut)
-                        //    .duration(20000)
-                        //    .style("opacity", "0")
-                        //    .transition()
-                        //    .delay(function (d, i) { return 10000 * i; })
-                        //    .ease(d3.easeSinInOut)
-                        //    .duration(10000)
-                        //    .style("opacity", "0.5")
-                        //    .transition()
-                        //    .delay(function (d, i) { return 10000 * i; })
-                        //    .ease(d3.easeSinInOut)
-                        //    .duration(10000)
-                        //    .style("opacity", "1");
+                        svg.selectAll('image')
+                            .transition()
+                            .delay(function (d, i) { return 100000 * i; })
+                            .ease(d3.easeSinInOut)
+                            .duration(20000)
+                            .style("opacity", "1");
 
                         //svg.append("text")
                         //    .attr("x", (width / 2))
@@ -217,12 +228,12 @@
                     }
 
                     total = d3.sum(rawData, d => +d.size);
-                    allYears = d3.group(rawData, d => d.year)
-                    years = allYears.keys()
+                    allYears = d3.group(rawData, d => d.year);
+                    years = allYears.keys();
 
                     function updateData() {
                         setTimeout(function () {
-                            window.scrollTo(width / 2, 0);
+                            window.scrollTo(width / 2, window.scrollY + document.querySelector('#vis').getBoundingClientRect().top);
                         }, 100);
 
                         for (const item of years) {
@@ -240,7 +251,7 @@
                                 .transition()
                                 .delay(function (d, i) { return 10 * i; })
                                 .duration(1000)
-                                .attr("cy", function (d) { return height / 2; })
+                                .attr("cy", height / 2)
                                 .attr("r", function (d) { return 0; })
                                 .remove();
 
@@ -266,15 +277,13 @@
                                 .transition()
                                 .delay(function (d, i) { return 100 * i; })
                                 .duration(2000)
-                                .attr("cy", function (d) { return height / 6; })
+                                .attr("cy", height / 6)
                                 .transition()
                                 .delay(function (d, i) { return 100 * i; })
                                 .duration(2000)
                                 .attr("cx", function (d) { return (d.radius % width) + width / 2; });
 
                             d3.selectAll('text').remove();
-
-                            //var yearArr = Array.from(allYears.get(item).values());
 
                             svg.append("text")
                                 .data(nodes.filter(d => d.year == item))
