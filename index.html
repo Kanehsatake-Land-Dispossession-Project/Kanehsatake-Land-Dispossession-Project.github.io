@@ -228,7 +228,7 @@
                         for (const item of years) {
                             svg.selectAll('.bubble')
                                 .data(nodes)
-                                .filter(function (d) { return d.year === item && d.buyer === 'Settlers (Sold by Sulpicians)' })
+                                .filter(function (d) { return d.year == item && d.buyer == 'Settlers (Sold by Sulpicians)' })
                                 .transition()
                                 .delay(function (d, i) { return 20 * i; })
                                 .duration(1000)
@@ -246,7 +246,7 @@
 
                             svg.selectAll('.bubble')
                                 .data(nodes)
-                                .filter(function (d) { return d.year === item && d.buyer === "Kanehsata'kerón (Kanehsatake)" })
+                                .filter(function (d) { return d.year == item && d.buyer == "Kanehsata'kerón (Kanehsatake)" })
                                 .transition()
                                 .delay(function (d, i) { return 1000 * i; })
                                 .duration(2000)
@@ -278,7 +278,7 @@
 
                             svg.append("text")
                                 .data(nodes.filter(d => d.year == item))
-                                .attr("x", width / 2)
+                                .attr("x", "50%")
                                 .attr("y", width / 6 - 80)
                                 .attr("text-anchor", "middle")
                                 .style("font-size", "0px")
@@ -321,7 +321,7 @@
                             // year
                             svg.append("text")
                                 .data(nodes.filter(d => d.year == item))
-                                .attr("x", (width / 2))
+                                .attr("x", "50%")
                                 .attr("y", 40)
                                 .attr("text-anchor", "middle")
                                 .style("font-size", "50px")
@@ -335,9 +335,9 @@
                             // buyer title
                             svg.append("text")
                                 .data(nodes.filter(d => d.year == item))
-                                .attr("x", (width / 5))
+                                .attr("x", "5%")
                                 .attr("y", 95)
-                                .attr("text-anchor", "middle")
+                                .attr("text-anchor", "start")
                                 .style("font-size", "25px")
                                 .style('fill', 'white')
                                 .transition()
@@ -358,9 +358,9 @@
                             // buyer title
                             svg.append("text")
                                 .data(nodes.filter(d => d.year == item))
-                                .attr("x", (width - (width / 5)))
+                                .attr("x", "95%")
                                 .attr("y", 95)
-                                .attr("text-anchor", "middle")
+                                .attr("text-anchor", "end")
                                 .style("font-size", "25px")
                                 .style('fill', 'white')
                                 .transition()
