@@ -47,11 +47,11 @@
 
             // bubbleChart creation function; instantiate new bubble chart given a DOM element to display it in and a dataset to visualise
             function bubbleChart() {
-                const width = 1920; //(window.innerWidth > 0) ? window.innerWidth : screen.width;
+                const width = (window.innerWidth > 0) ? window.innerWidth : screen.width;
                 const height = width;
 
                 setTimeout(function () {
-                    window.scrollTo(0, height / 4);
+                    window.scrollTo(width / 2, height / 4);
                 }, 100);
 
                 // location to centre the bubbles
@@ -222,7 +222,7 @@
 
                     function updateData() {
                         setTimeout(function () {
-                            window.scrollTo(0, 0);
+                            window.scrollTo(width / 2, 0);
                         }, 100);
 
                         for (const item of years) {
@@ -335,8 +335,8 @@
                             // buyer title
                             svg.append("text")
                                 .data(nodes.filter(d => d.year == item))
-                                .attr("x", (width / 6))
-                                .attr("y", 80)
+                                .attr("x", (width / 5))
+                                .attr("y", 95)
                                 .attr("text-anchor", "middle")
                                 .style("font-size", "25px")
                                 .style('fill', 'white')
@@ -358,8 +358,8 @@
                             // buyer title
                             svg.append("text")
                                 .data(nodes.filter(d => d.year == item))
-                                .attr("x", (width - (width / 6)))
-                                .attr("y", 80)
+                                .attr("x", (width - (width / 5)))
+                                .attr("y", 95)
                                 .attr("text-anchor", "middle")
                                 .style("font-size", "25px")
                                 .style('fill', 'white')
