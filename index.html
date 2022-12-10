@@ -22,6 +22,9 @@
     </style>
 </head>
 <body>
+    <div style="background-color: #78259f; margin-bottom: -4%;">
+        <img src="resources/header.png" width="833" height="107">
+    </div>
     <!--Navbar Links-->
     <nav class="page__menu page__custom-settings menu">
         <ul class="menu__list r-list">
@@ -73,10 +76,6 @@
             function bubbleChart() {
                 const width = (window.innerWidth > 0) ? window.innerWidth : screen.width;
                 const height = width;
-
-                setTimeout(function () {
-                    window.scrollTo(width / 2, height / 4);
-                }, 100);
 
                 // location to centre the bubbles
                 const centre = { x: width / 2, y: height / 2 };
@@ -151,11 +150,58 @@
 
                     svg.append('image')
                         .attr('xlink:href', 'resources/graph.png')
-                        .attr("x", (width / 2) - ((892 * 1.2) / 2))
-                        .attr("y", (height / 2) - (457 * 1.2))
-                        .attr('width', 892 * 1.2)
-                        .attr('height', 704 * 1.2)
+                        .attr("x", (width / 2) - (892 / 2))
+                        .attr("y", (height / 2) - 457)
+                        .attr('width', 892)
+                        .attr('height', 704)
                         .style("opacity", "0");
+
+                    // year
+                    svg.append("text")
+                        .attr("x", "50%")
+                        .attr("y", 40)
+                        .attr("text-anchor", "middle")
+                        .style("font-size", "50px")
+                        .style('fill', 'red')
+                        .style("text-decoration", "underline")
+                        .transition()
+                        .duration(10000)
+                        .textTween((d) => t => 'Year: 1735')
+                        .end();
+
+                    // total area
+                    svg.append("text")
+                        .attr("x", (width / 2))
+                        .attr("y", 80)
+                        .attr("text-anchor", "middle")
+                        .style("font-size", "25px")
+                        .style('fill', 'white')
+                        .text(d => ("Total Area: " + addCommas("539889031") + "m²"));
+
+                    // How much land is left for the Kanehsata'kerón?
+                    svg.append("text")
+                        .attr("x", "50%")
+                        .attr("y", width / 6 - 80)
+                        .attr("text-anchor", "middle")
+                        .style("font-size", "35px")
+                        .style('fill', '#78259f')
+                        .text("How much land is left for the Kanehsata'kerón?")
+                        .transition()
+                        .delay(function (d, i) { return 1000000 * i; })
+                        .ease(d3.easeSinInOut)
+                        .duration(10000)
+                        .style("font-size", "50px")
+                        .style('stroke', '#78259f')
+                        .transition()
+                        .delay(function (d, i) { return 1000000 * i; })
+                        .ease(d3.easeSinInOut)
+                        .duration(10000)
+                        .style("opacity", "0");
+
+                    // automatically scroll to bubbles
+                    setTimeout(function () {
+                        window.scrollTo(width / 2, height / 4);
+                    }, 5000);
 
                     // bind nodes data to circle elements
                     elements = svg.selectAll('.bubble')
@@ -351,7 +397,7 @@
                                 .style('fill', 'white')
                                 .transition()
                                 .duration(10000)
-                                .textTween((d) => t => `Settlers (Sold by Sulpicians): ${addCommas(Math.round(t.toFixed(6) * d.totalS))}m²`)
+                                .textTween((d) => t => `Land Sold to Settlers: ${addCommas(Math.round(t.toFixed(6) * d.totalS))}m²`)
                                 .end();
 
                             // title
@@ -374,7 +420,7 @@
                                 .style('fill', 'white')
                                 .transition()
                                 .duration(10000)
-                                .textTween((d) => t => `Kanehsata'kerón (Kanehsatake): ${addCommas(d.total - Math.round(t.toFixed(6) * d.totalS))}m²`);
+                                .textTween((d) => t => `Land Left for the Kanehsata'kerón: ${addCommas(d.total - Math.round(t.toFixed(6) * d.totalS))}m²`);
                         }
 
                         // set simulation's nodes to our newly created nodes array

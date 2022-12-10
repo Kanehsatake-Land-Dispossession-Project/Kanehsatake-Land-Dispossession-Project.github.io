@@ -49,7 +49,6 @@ html {
     position: fixed;
     z-index: 2;
     right: 20px;
-    /* left: 20px; */
     top: 20px;
     height: 50px;
     width: 50px;
@@ -59,15 +58,19 @@ html {
     font-size: 20px;
     color: #fff;
     cursor: pointer;
-    /*background: linear-gradient(-135deg, #c850c0, #4158d0);*/
-    /* background: linear-gradient(375deg, #1cc7d0, #2ede98); */
-    /* background: linear-gradient(-45deg, #e3eefe 0%, #efddfb 100%); */
     background: #78259f;
-    transition: all 0.3s ease-in-out;
+    transition: all 500ms ease-in-out;
 }
+
+    .menu-btn:hover {
+        /* background: linear-gradient(-135deg, #c850c0, #4158d0); */
+        background-color: #e7d4e8;
+        color: #78259f;
+    }
 
 #active:checked ~ .menu-btn {
     color: #fff;
+    transform: rotate(90deg);
 }
 
     #active:checked ~ .menu-btn i:before {
@@ -138,7 +141,7 @@ DEPENDENCES
 =====
 */
 
-.r-link {
+    .r-link {
     display: var(--rLinkDisplay, inline-flex) !important;
 }
 
@@ -193,13 +196,14 @@ PRESENTATION STYLES
 */
 
 .menu {
-    font-size: 50%;
+    font-size: 35%;
     background-color: var(--menuBackgroundColor, #f0f0f0);
     box-shadow: var(--menuBoxShadow, 0 1px 3px 0 rgba(0, 0, 0, .12), 0 1px 2px 0 rgba(0, 0, 0, .24));
 }
 
 .menu__list {
-    display: flex;
+    display: -webkit-flex;
+    justify-content: center;
 }
 
 .menu__link {
@@ -291,7 +295,6 @@ DEMO
     text-align: left;
     width: calc(100% - 4rem);
     margin: 0 auto;
-    font-weight: bold;
 }
 
 .content p {
@@ -300,26 +303,23 @@ DEMO
 
 .content a {
     text-decoration: none;
-    text-shadow: 2px 2px #c2a5cf;
-    color: #1b7837;
+    color: #b2b2b2;
+    text-shadow: 1px -1px 0 #000;
 }
 
 .content a:hover {
     transition: color 500ms ease-out;
-    text-shadow: 0.5px 0.5px #1b7837;
     color: #9970ab;
 }
 
 .content h2 {
     text-align: center;
     color: #78259f;
-    text-decoration: underline #c2a5cf;
 }
 
 .content h3 {
     text-align: left;
     color: #78259f;
-    text-decoration: underline overline #c2a5cf;
 }
 
 div.gallery {
