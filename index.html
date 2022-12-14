@@ -431,7 +431,21 @@
                                 .style('fill', 'white')
                                 .transition()
                                 .duration(10000)
-                                .textTween((d) => t => `Land Left for the Kanehsata'kerón: ${addCommas(d.total - Math.round(t.toFixed(6) * d.totalS))}m²`);
+                                .textTween((d) => t => `Land Left for the Kanehsata'kerón: ${addCommas(d.total - Math.round(t.toFixed(6) * d.totalS))}m²`)
+                                .end();
+
+                            // number of lots
+                            svg.append("text")
+                                .data(nodes.filter(d => d.year == item))
+                                .attr("x", "5%")
+                                .attr("y", 320)
+                                .attr("text-anchor", "start")
+                                .style("font-size", "25px")
+                                .style('fill', 'grey')
+                                .transition()
+                                .duration(10000)
+                                .textTween((d) => t => `A total of ${addCommas(Math.round(t.toFixed(6) * 1829))} lots sold to Settlers.`)
+                                .end();
                         }
 
                         // set simulation's nodes to our newly created nodes array
