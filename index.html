@@ -74,6 +74,12 @@
 
             // bubbleChart creation function; instantiate new bubble chart given a DOM element to display it in and a dataset to visualise
             function bubbleChart() {
+                // Macbooks have 16:10 aspect ratio
+                // Most Windows laptops and 1920x1080 monitors have 16:9 aspect ratio
+                //console.log(screen.width);
+                //console.log(screen.width % 16);
+                //console.log(window.innerWidth);
+                //console.log(window.innerWidth % 16);
                 const width = (window.innerWidth > 0) ? window.innerWidth : screen.width;
                 const height = width;
 
@@ -101,7 +107,7 @@
                     .force('center', d3.forceCenter(centre.x, centre.y))
                     .force('x', d3.forceX().strength(forceStrength).x(centre.x))
                     .force('y', d3.forceY().strength(forceStrength).y(centre.y))
-                    .force('collision', d3.forceCollide().radius(d => d.radius + 1));
+                    .force('collision', d3.forceCollide().radius(d => d.radius - (d.radius * 0.25))); //.force('collision', d3.forceCollide().radius(d => d.radius + 1));
 
                 // force simulation starts up automatically, which we don't want as there aren't any nodes yet
                 simulation.stop();
@@ -148,13 +154,14 @@
                         .attr('width', width)
                         .attr('height', height)
 
-                    svg.append('image')
-                        .attr('xlink:href', 'resources/graph.png')
-                        .attr("x", (width / 2) - (892 / 2))
-                        .attr("y", (height / 2) - 457)
-                        .attr('width', 892)
-                        .attr('height', 704)
-                        .style("opacity", "0");
+                    // Put in image
+                    //svg.append('image')
+                    //    .attr('xlink:href', 'resources/graph.png')
+                    //    .attr("x", (width / 2) - (892 / 2))
+                    //    .attr("y", (height / 2) - 457)
+                    //    .attr('width', 892)
+                    //    .attr('height', 704)
+                    //    .style("opacity", "0");
 
                     // year
                     svg.append("text")
@@ -163,7 +170,6 @@
                         .attr("text-anchor", "middle")
                         .style("font-size", "50px")
                         .style('fill', 'red')
-                        .style("text-decoration", "underline")
                         .transition()
                         .duration(10000)
                         .textTween((d) => t => 'Year: 1735')
@@ -176,7 +182,7 @@
                         .attr("text-anchor", "middle")
                         .style("font-size", "25px")
                         .style('fill', 'white')
-                        .text(d => ("Total Area: " + addCommas("539889031") + "m²"));
+                        .text(d => ("Total Area of Kanehsata'kerón Land: " + addCommas("539889031") + "m²"));
 
                     // How much land is left for the Kanehsata'kerón?
                     svg.append("text")
@@ -185,7 +191,7 @@
                         .attr("text-anchor", "middle")
                         .style("font-size", "35px")
                         .style('fill', '#78259f')
-                        .text("How much land is left for the Kanehsata'kerón?")
+                        .text("How much land is left for the Kanehsata'kerón today?")
                         .transition()
                         .delay(function (d, i) { return 1000000 * i; })
                         .ease(d3.easeSinInOut)
@@ -200,8 +206,8 @@
 
                     // automatically scroll to bubbles
                     setTimeout(function () {
-                        window.scrollTo(width / 2, height / 4);
-                    }, 5000);
+                        window.scrollTo(width / 2, height / 3);
+                    }, 11000);
 
                     // bind nodes data to circle elements
                     elements = svg.selectAll('.bubble')
@@ -232,45 +238,52 @@
                         .restart();
 
                     function showMore() {
-                        svg.selectAll('image')
+                        // Bring in Image
+                        //svg.selectAll('image')
+                        //    .transition()
+                        //    .delay(function (d, i) { return 100000 * i; })
+                        //    .ease(d3.easeSinInOut)
+                        //    .duration(20000)
+                        //    .style("opacity", "1");
+
+                        svg.append("text")
+                            .attr("x", (width / 2))
+                            .attr("y", 30 + height / 3)
+                            .attr("text-anchor", "middle")
+                            .style("font-size", "20px")
+                            .style('fill', 'white')
+                            .style("opacity", "0")
                             .transition()
-                            .delay(function (d, i) { return 100000 * i; })
-                            .ease(d3.easeSinInOut)
+                            .delay(function (d, i) { return 10000000 * i; })
                             .duration(20000)
-                            .style("opacity", "1");
+                            .style("opacity", "1")
+                            .text("The grey bubbles represent all the transactions involving sales or concessions of land made to European settlers and their descendants");
 
-                        //svg.append("text")
-                        //    .attr("x", (width / 2))
-                        //    .attr("y", height / 2)
-                        //    .attr("text-anchor", "middle")
-                        //    .style("font-size", "40px")
-                        //    .style("font-weight", "bold")
-                        //    .style('fill', 'white')
-                        //    .text("About the Map");
+                        svg.append("text")
+                            .attr("x", (width / 2))
+                            .attr("y", 60 + height / 3)
+                            .attr("text-anchor", "middle")
+                            .style("font-size", "20px")
+                            .style('fill', 'white')
+                            .style("opacity", "0")
+                            .transition()
+                            .delay(function (d, i) { return 10000000 * i; })
+                            .duration(20000)
+                            .style("opacity", "1")
+                            .text("from 1780 to 1960 by a Catholic seminary run by the Society of the Priests of Saint Sulpice, later known as “Les Sulpiciens de Montréal”.");
 
-                        //svg.append("text")
-                        //    .attr("x", (width / 2))
-                        //    .attr("y", 30 + height / 2)
-                        //    .attr("text-anchor", "middle")
-                        //    .style("font-size", "25px")
-                        //    .style('fill', 'white')
-                        //    .text("This map shows all the transactions involving sales or concessions of land made to European settlers and their descendants");
-
-                        //svg.append("text")
-                        //    .attr("x", (width / 2))
-                        //    .attr("y", 55 + height / 2)
-                        //    .attr("text-anchor", "middle")
-                        //    .style("font-size", "25px")
-                        //    .style('fill', 'white')
-                        //    .text("from 1780 to 1960 by a Catholic seminary run by the Society of the Priests of Saint Sulpice, later known as “Les Sulpiciens de Montréal”.");
-
-                        //svg.append("text")
-                        //    .attr("x", (width / 2))
-                        //    .attr("y", 75 + height / 2)
-                        //    .attr("text-anchor", "middle")
-                        //    .style("font-size", "25px")
-                        //    .style('fill', 'white')
-                        //    .text("The map also shows the lots which were purchased back by the government of Canada to form the interim land base known as Kanehsatà: ke today.");
+                        svg.append("text")
+                            .attr("x", (width / 2))
+                            .attr("y", 90 + height / 3)
+                            .attr("text-anchor", "middle")
+                            .style("font-size", "20px")
+                            .style('fill', 'white')
+                            .style("opacity", "0")
+                            .transition()
+                            .delay(function (d, i) { return 10000000 * i; })
+                            .duration(20000)
+                            .style("opacity", "1")
+                            .text("The purple bubbles are the lots which were purchased back by the government of Canada to form the interim land base known as Kanehsatà: ke today.");
                     }
 
                     total = d3.sum(rawData, d => +d.size);
@@ -290,16 +303,14 @@
                                 .delay(function (d, i) { return 20 * i; })
                                 .duration(1000)
                                 .style("stroke", "white")
-                                .transition()
-                                .delay(function (d, i) { return 20 * i; })
-                                .duration(1000)
                                 .style("fill", "grey")
+                                .style("opacity", "0.5")
                                 .transition()
-                                .delay(function (d, i) { return 10 * i; })
+                                .delay(function (d, i) { return 30 * i; })
                                 .duration(1000)
-                                .attr("cy", height / 2)
-                                .attr("r", function (d) { return 0; })
-                                .remove();
+                                .style("opacity", "0.25")
+                                .attr("cx", function (d) { return (d.radius % width) + (width * 0.05); })
+                                .attr("cy", 200);
 
                             svg.selectAll('.bubble')
                                 .data(nodes)
@@ -311,7 +322,8 @@
                                 .transition()
                                 .delay(function (d, i) { return 1000 * i; })
                                 .duration(2000)
-                                .attr("cy", function (d) { return height / 2; })
+                                .attr("cx", function (d) { return (d.radius % width) + (width * 0.05); })
+                                .attr("cy", 200)
                                 .transition()
                                 .delay(function (d, i) { return 100 * i; })
                                 .duration(2000)
@@ -381,7 +393,6 @@
                                 .attr("text-anchor", "middle")
                                 .style("font-size", "50px")
                                 .style('fill', 'red')
-                                .style("text-decoration", "underline")
                                 .transition()
                                 .duration(10000)
                                 .textTween((d) => t => `Year: ${1780 + Math.round(t.toFixed(6) * (d.year - 1780))}`)
